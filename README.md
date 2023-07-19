@@ -10,7 +10,7 @@ and the date this occurred.
 You can do anything you like with these public-domain libraries. Attribution is appreciated, but you have no legal
 obligation. 
 
-If you would prefer to use the BSD-3-Claus licencee, every source file contains an explicit dual-licence for you to
+If you would prefer to use the BSD-3-Claus licence, every source file contains an explicit dual-licence for you to
 choose from.
 
 ## Libraries
