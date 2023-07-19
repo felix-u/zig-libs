@@ -1,6 +1,9 @@
-// Last tested with zig 0.11.0-dev.4004+a57608217 on 2023-07-18T22:31:40Z
+// Last tested with zig 0.11.0-dev.4004+a57608217 on 2023-07-19T03:06:40Z
+//
 // args.zig - public domain command-line argument parser - felix-u
-// no warranty implied; use at your own risk
+//
+// No warranty implied; use at your own risk.
+// See end of file for licence information.
 //
 //
 // Documentation contains:
@@ -9,6 +12,8 @@
 // * Guarantees
 // * Notes
 // * Examples
+//
+// For a quick start, view the examples, then refer to Usage as needed.
 //
 // Throughout this documentation, `args_parsed` refers to what is returned by `args_parseAlloc(...)`.
 //
@@ -64,13 +69,22 @@
 //
 // If your program has subcommands, define multiple commands. Otherwise, define one (1).
 //
-// Command results are accessed through `args_parsed.command_name`, which is nullable only if the number of commands
-// provided is greater than one (1).
+// Command results are accessed through `args_parsed.command_name`, which is nullable if the number of commands
+// provided is greater than one (1). This field has the following subfields:
+// * `.invoked: bool` - always true for single commands;
+// * `.pos` - `bool` if `cmd.kind = .boolean`, `[]const u8` if `cmd.kind = .single_pos`, and
+//   `std.Arraylist([]const u8)` if `cmd.kind = .multi_pos`;
+// * Another field for each flag - see next paragraph.
 //
 // Flag results are accessed through `args_parsed.command_name.flag_long_form`. The type of this field is:
 // * `bool` if `flag.kind = .boolean`;
-// * `[]const u8` if `flag.kind = .single_pos`;
+// * `[]const u8` if `flag.kind = .single_pos`, and nullable if `flag.required = false`;
 // * `std.ArrayList([]const u8)` if `flag.kind = .multi_pos`.
+// Therefore, to test for the presence of a non-required flag, either check:
+// * if its field is `true`;
+// * if its field is not null;
+// * if field.items.len > 0;
+// based on the above types.
 //
 //
 // Guarantees:
@@ -78,7 +92,7 @@
 // * `args.parseAlloc()` will return an error if incorrect usage was detected, null if `--help` or `--version` were
 //   called, and a comptime-generated result type otherwise. See Examples.
 //
-// * If there are multiple subcommands, exactly one (1) will have `.invoked = true` after returning a result type.
+// * If there are multiple subcommands, exactly one (1) in the result type will have `.invoked = true`.
 //
 // * args.parseAlloc() ensures the following:
 //     - Flags and commands with `.kind = .single_pos` have received exactly one (1) positional argument from the user.
@@ -99,15 +113,17 @@
 //
 // * If there is only one (1) `args.Cmd`, it is not considered a subcommand. Leave its `.desc` and `.usage` empty and
 //   use `ParseParams.desc` and `ParseParams.usage` instead. The `.name` of a single `args.Cmd` is not used at runtime,
-//   but is used by the programmer to access the fields of the command's result type, i.e. `args_parsed.name.pos.items`.
-//   A single `args.Cmd` is guaranteed to have `.invoked = true` - this does not need to be checked in your code.
+//   but is used by the programmer to access the fields of the command's result type, i.e.
+//   `args_parsed.cmd_name.pos.items`. A single `args.Cmd` is guaranteed to have `.invoked = true` - this does not need
+//   to be checked.
 //
-// * The default error messages can be modified to your liking by editing the `errMsg` function.
+// * The default error messages can be modified by editing the `errMsg` function.
 //
-// * If no `ParseParams.ver` is provided by the programmer, no `--version` option will be available.
+// * If `ParseParams.ver` is not set to a non-empty string, no `--version` flag will be generated.
 //
-// * `ParseParams.usage` and `Cmd.usage` are just for the help text - you can set them to whatever you like, or leave
+// * `ParseParams.usage` and `Cmd.usage` are for the help text - you can set them to whatever you like, or leave
 //   them empty. When printed, they are preceded by the binary or command names.
+//
 //
 // Example: `ls`
 // ------
@@ -271,7 +287,6 @@
 //       Print this help and exit
 //
 // -----
-//
 
 const std = @import("std");
 
@@ -862,3 +877,39 @@ pub fn printCmd(writer: std.fs.File.Writer, comptime cmd: Cmd) !void {
 
     try writer.writeByte('\n');
 }
+
+// ------
+// This software is available under 2 licences. Choose whichever you prefer.
+// ------
+// ALTERNATIVE A - BSD-3-Clause (https://opensource.org/license/bsd-3-clause/)
+// Copyright 2023 felix-u
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+// following conditions are met:
+// 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+// disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+// following disclaimer in the documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+// products derived from this software without specific prior written permission.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES,
+// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// ------
+// ALTERNATIVE B - Public Domain (https://unlicense.org)
+// This is free and unencumbered software released into the public domain.
+// Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form
+// or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.
+// In jurisdictions that recognize copyright laws, the author or authors of this software dedicate any and all copyright
+// interest in the software to the public domain. We make this dedication for the benefit of the public at large and to
+// the detriment of our heirs and successors. We intend this dedication to be an overt act of relinquishment in
+// perpetuity of all present and future rights to this software under copyright law.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// For more information, please refer to <http://unlicense.org/>
+// ------
