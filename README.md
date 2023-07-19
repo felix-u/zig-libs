@@ -1,5 +1,4 @@
 # zig-libs
-===
 
 Single-file public domain (or BSD-3-Clause) Zig libraries.
 
