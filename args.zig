@@ -1,4 +1,4 @@
-// Last tested with zig 0.12.0-dev.164+7a834e258 on 2023-08-24T18:00:34Z
+// Last tested with zig 0.12.0-dev.878+7abf9b3a8 on 2023-10-17T16:57:23Z
 //
 // args.zig - public domain command-line argument parser - felix-u
 //
@@ -523,7 +523,7 @@ pub fn parseAlloc(
                     (flag.short != 0 and flag_cmp.short != 0) and
                     (flag.short == flag_cmp.short);
 
-                if (!duplicate_flag) @compileError(std.fmt.comptimePrint(
+                if (duplicate_flag) @compileError(std.fmt.comptimePrint(
                     "flags '{s}' and '{s}' belong to the same command " ++
                         "and cannot share their short form '{c}'",
                     .{ flag.long, flag_cmp.long, flag.short },
