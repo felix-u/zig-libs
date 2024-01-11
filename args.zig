@@ -1,4 +1,4 @@
-// Last tested with zig 0.12.0-dev.1270+6c9d34bce on 2023-10-25T21:01:26Z
+// Last tested with zig 0.12.0-dev.2139+e025ad7b4 on 2024-01-11
 //
 // args.zig - public domain command-line argument parser - felix-u
 //
@@ -413,7 +413,7 @@ pub const Cmd = struct {
 
         inline for (fields[2..], self.flags) |*field, flag| {
             field.* = .{
-                .name = flag.long,
+                .name = @ptrCast(flag.long),
                 .type = flag.resultType(),
                 .default_value = null,
                 .is_comptime = false,
@@ -435,7 +435,7 @@ pub const Cmd = struct {
         comptime var fields: [cmds.len]StructField = undefined;
         inline for (&fields, cmds) |*field, cmd| {
             field.* = .{
-                .name = cmd.name,
+                .name = @ptrCast(cmd.name),
                 .type = cmd.resultType(),
                 .default_value = null,
                 .is_comptime = false,
@@ -491,7 +491,7 @@ pub fn parseAlloc(
         const cmd = p.cmds[i];
 
         if (cmd.kind == .multi_pos) {
-            var array_list = std.ArrayList([]const u8).init(allocator);
+            const array_list = std.ArrayList([]const u8).init(allocator);
             const flag_list = &@field(result, cmd.name).pos;
             flag_list.* = array_list;
             try flag_list.ensureTotalCapacity(argv.len);
@@ -499,7 +499,7 @@ pub fn parseAlloc(
 
         inline for (cmd.flags) |flag| {
             if (flag.kind != .multi_pos) continue;
-            var array_list = std.ArrayList([]const u8).init(allocator);
+            const array_list = std.ArrayList([]const u8).init(allocator);
             const flag_list = &@field(@field(result, cmd.name), flag.long);
             flag_list.* = array_list;
             try flag_list.ensureTotalCapacity(argv.len);
@@ -532,7 +532,7 @@ pub fn parseAlloc(
         }
     }
 
-    var kinds = try allocator.alloc(ArgKind, argv.len - 1);
+    const kinds = try allocator.alloc(ArgKind, argv.len - 1);
     defer allocator.free(kinds);
     procArgKindList(p, kinds, argv[1..]);
 
@@ -815,7 +815,7 @@ fn procCmd(
     }
 
     inline for (cmd.flags) |flag| {
-        var flag_res = &@field(cmd_res, flag.long);
+        const flag_res = &@field(cmd_res, flag.long);
 
         if (flag.required) switch (flag.kind) {
             inline .boolean => if (flag_res == false) {
