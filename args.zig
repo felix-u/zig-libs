@@ -1,4 +1,4 @@
-// Last tested with zig 0.12.0-dev.2139+e025ad7b4 on 2024-01-11
+// Last tested with zig 0.12.0-dev.3352+95cb93944 on 2024-03-18T17:37:28Z
 //
 // args.zig - public domain command-line argument parser - felix-u
 //
@@ -421,12 +421,14 @@ pub const Cmd = struct {
             };
         }
 
-        return @Type(.{ .Struct = .{
-            .layout = .Auto,
-            .fields = &fields,
-            .decls = &.{},
-            .is_tuple = false,
-        } });
+        return @Type(.{
+            .Struct = .{
+                .layout = .auto,
+                .fields = &fields,
+                .decls = &.{},
+                .is_tuple = false,
+            },
+        });
     }
 
     fn listResultType(comptime cmds: []const @This()) type {
@@ -444,7 +446,7 @@ pub const Cmd = struct {
         }
 
         return @Type(.{ .Struct = .{
-            .layout = .Auto,
+            .layout = .auto,
             .fields = &fields,
             .decls = &.{},
             .is_tuple = false,
